@@ -1,0 +1,26 @@
+{
+  "name": "emporiadataanalyzer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "@types/chart.js": "^2.9.41",
+    "@types/node": "^22.10.5",
+    "@types/papaparse": "^5.3.15",
+    "chartjs-plugin-zoom": "^2.2.0",
+    "papaparse": "^5.5.1",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5",
+    "vite-plugin-gh-pages": "^1.0.1"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.7",
+    "csv-parser": "^3.1.0"
+  }
+}
