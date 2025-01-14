@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,8 +9,14 @@
     /* Make sure the container for the chart is responsive */
     #chart-container {
       width: 100%;
-      height: 50%;  /* Reduced height for better screen fit */
+      height: 900px;  /* Reduced height for better screen fit */
       margin-bottom: 10px;  /* Space between the chart and label */
+      position: relative; /* Ensure that the button is positioned relative to this container */
+    }
+
+    #chart {
+      width: 100% !important;
+      height: 100% !important;
     }
 
     canvas {
@@ -23,18 +30,46 @@
       margin-top: 10px;
       text-align: left;
     }
+
+    /* Position the zoom reset button on the top-right corner */
+    /* Position the zoom reset button above the chart */
+    #reset-zoom {
+      position: absolute;
+      top: -40px; /* Position above the chart */
+      right: 10px; /* Stick to the right side */
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+
+      z-index: 10; /* Ensure the button is above the chart */
+    }
+
+
+    /* Hover effect for the button */
+    #reset-zoom:hover {
+      background-color: #0056b3; /* Darker color on hover */
+    }
+
+
   </style>
-  <script type="module" crossorigin src="/EmporiaDataAnalyzer/assets/index-BNbbX4od.js"></script>
+  <script type="module" crossorigin src="/EmporiaDataAnalyzer/assets/index-CKqRWy_W.js"></script>
 </head>
+
 <body>
   <h1>Emporia Data Analyzer</h1>
-  <p>Upload your CSV file to analyze and view the graph:</p>  
-  <input type="file" id="fileInput" accept=".csv" />  
+  <p>Upload your CSV file to analyze and view the graph:</p>
+  <input type="file" id="fileInput" accept=".csv" />
+
+  <div id="chart" style="width: 100%; height: 500px;"></div>  
   <div id="chart-container">
+    <button id="reset-zoom">Reset Zoom</button>
     <canvas id="chart"></canvas>
   </div>
   <div id="max-sum"></div>
-  <div id="max-sum"></div> <!-- This will display the max sum -->
-
 </body>
+
 </html>
