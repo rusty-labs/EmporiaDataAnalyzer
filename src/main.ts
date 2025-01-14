@@ -1,94 +1,103 @@
 import Papa from 'papaparse';
-import { Chart, registerables } from 'chart.js';
-import zoomPlugin from 'chartjs-plugin-zoom'; // Import the zoom plugin
+import * as echarts from 'echarts';
 
-// Register Chart.js components and the zoom plugin
-Chart.register(...registerables, zoomPlugin); // Register both the core and the plugin
-
-let chartInstance: Chart | null = null;
-
+let chartInstance: echarts.ECharts | null = null;
 
 // Function to render the graph
 const renderGraph = (labels: string[], mainsA: number[], mainsB: number[], mainsC: number[], maxSum: number): void => {
-  const ctx = document.getElementById('chart') as HTMLCanvasElement;
+  const chartContainer = document.getElementById('chart') as HTMLElement;
 
-  // Destroy existing chart instance if it exists
-  if (chartInstance !== null) {
-    chartInstance.destroy();
+  // Initialize ECharts
+  if (chartInstance === null) {
+    chartInstance = echarts.init(chartContainer, {
+      renderer: 'svg',
+    });
   }
-  
-  chartInstance = new Chart(ctx, {
-    type: 'line', // Line chart
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Mains A (kWhs)',
-          data: mainsA,
-          borderColor: 'red',  // Color for the Mains_A line
-          borderWidth: 2,
-          fill: false,
-        },
-        {
-          label: 'Mains B (kWhs)',
-          data: mainsB,
-          borderColor: 'blue',
-          borderWidth: 2,
-          fill: false,
-        },
-        {
-          label: 'Mains C (kWhs)',
-          data: mainsC,
-          borderColor: 'green',
-          borderWidth: 2,
-          fill: false,
-        },
-      ],
+
+  // Set the chart options
+  chartInstance.setOption({
+    large: true,
+    largeThreshold: 1000,
+    title: {
+      text: `Max Sum of Mains A, B, C: ${maxSum.toFixed(4)} kWhs`,
+      left: 'center',
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,  // Disable aspect ratio to fit the container size
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-        },
-        zoom: {
-          pan: {
-            enabled: true,
-            mode: 'xy', // Pan in both x and y directions
-          },
-          zoom: {
-            wheel: {
-              enabled: true, // Enable zooming with mouse wheel
-            },
-            pinch: {
-              enabled: true, // Enable pinch zooming on touch devices
-            },
-          },
-        },
-      },
-      scales: {
-        x: {          
-          title: {
-            display: true,
-            text: 'Timestamp',
-          },
-          ticks: {
-            maxTicksLimit: 20, // Show fewer points initially
-          },
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'kWhs',
-          },
-          ticks: {
-            maxTicksLimit: 20, // Show fewer ticks initially on Y-axis
-          },
-        },
-      },
+    tooltip: {
+      trigger: 'axis',
     },
+    legend: {
+      data: ['Mains A (kWhs)', 'Mains B (kWhs)', 'Mains C (kWhs)'],
+      top: 'bottom',
+    },
+    xAxis: {
+      type: 'category',
+      data: labels,
+      name: 'Timestamp',
+      nameLocation: 'middle',
+      nameGap: 25,
+    },
+    yAxis: {
+      type: 'value',
+      name: 'kWhs',
+      nameLocation: 'middle',
+      nameGap: 40,
+    },
+    series: [
+      {
+        name: 'Mains A (kWhs)',
+        type: 'bar',
+        data: mainsA,
+        itemStyle: { color: 'red' },
+      },
+      {
+        name: 'Mains B (kWhs)',
+        type: 'bar',
+        data: mainsB,
+        itemStyle: { color: 'green' },
+      },
+      /*
+            {
+              type: 'custom',
+              data: mainsC,
+              renderItem: (params: any, api: any) => {
+                // Access data
+                const x = api.value(0);
+                const y = api.value(1);
+      
+                // Create a Three.js geometry for the bar (rectangular prism)
+                const geometry = new THREE.BoxGeometry(1, 1, 1); // Bar size can be adjusted here
+                const material = new THREE.MeshBasicMaterial({ color: 0xff5733 });
+                const mesh = new THREE.Mesh(geometry, material);
+      
+                // Position the bar based on the data
+                mesh.position.set(x, y, 0);
+      
+                // Add bar to the scene
+                params.context.scene.add(mesh);
+      
+                // Return empty object because ECharts handles rendering
+                return {};
+              },
+            }
+      */
+
+      {
+        name: 'Mains C (kWhs)',
+        type: 'bar',
+        data: mainsC,
+        itemStyle: { color: 'blue' },
+      },
+    ],
+    dataZoom: [
+      {
+        type: 'slider', // Zoom slider on the bottom
+        xAxisIndex: 0,
+      },
+      {
+        type: 'inside', // Zoom with mouse wheel
+        xAxisIndex: 0,
+      },
+    ],
   });
 
   // Display the maximum sum on the page
@@ -97,9 +106,16 @@ const renderGraph = (labels: string[], mainsA: number[], mainsB: number[], mains
 
   document.getElementById('reset-zoom')?.addEventListener('click', () => {
     if (chartInstance) {
-      chartInstance.resetZoom();  // Reset zoom and pan
+      chartInstance.dispatchAction({
+        type: 'dataZoom',
+        start: 0, // Reset the zoom to the start
+        end: 100, // Reset the zoom to the end
+      });
     }
   });
+
+
+
 };
 
 // Function to parse large CSV files efficiently using PapaParse
@@ -172,3 +188,5 @@ fileInput.addEventListener('change', (event) => {
     parseCSVWithPapa(file);
   }
 });
+
+
